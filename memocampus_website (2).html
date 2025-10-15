@@ -1,0 +1,1662 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MemoCampus - Gestor Inteligente de Entregas Académicas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #00d9ff;
+            --secondary: #16213e;
+            --dark: #1a1a2e;
+            --accent: #e94560;
+            --success: #2ecc71;
+            --text-light: #ffffff;
+            --text-gray: #cccccc;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--dark);
+            color: var(--text-light);
+            overflow-x: hidden;
+        }
+
+        /* Navbar */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(22, 33, 62, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0, 217, 255, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: color 0.3s;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        .menu-toggle span {
+            width: 25px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px;
+            transition: 0.3s;
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--dark) 0%, var(--secondary) 100%);
+            position: relative;
+            overflow: hidden;
+            padding: 0 5%;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(0, 217, 255, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            top: -200px;
+            right: -200px;
+            animation: pulse 4s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            z-index: 1;
+        }
+
+        .hero-text h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: slideInLeft 0.8s ease;
+        }
+
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .hero-text p {
+            font-size: 1.3rem;
+            color: var(--text-gray);
+            margin-bottom: 2rem;
+            animation: slideInLeft 0.8s ease 0.2s both;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            animation: slideInLeft 0.8s ease 0.4s both;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--dark);
+        }
+
+        .btn-primary:hover {
+            background: var(--text-light);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 217, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: var(--dark);
+        }
+
+        .hero-image {
+            animation: slideInRight 0.8s ease;
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .mockup {
+            width: 100%;
+            max-width: 500px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 217, 255, 0.3);
+            border: 3px solid var(--primary);
+        }
+
+        /* Sections */
+        section {
+            padding: 5rem 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: var(--primary);
+        }
+
+        /* Objetivos */
+        .objetivos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .objetivo-card {
+            background: var(--secondary);
+            padding: 2rem;
+            border-radius: 15px;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .objetivo-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0, 217, 255, 0.2);
+        }
+
+        .objetivo-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .objetivo-card h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        /* Enfoque */
+        .enfoque-content {
+            background: var(--secondary);
+            padding: 3rem;
+            border-radius: 20px;
+            border-left: 5px solid var(--primary);
+        }
+
+        .enfoque-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .enfoque-item {
+            display: flex;
+            align-items: start;
+            gap: 1rem;
+        }
+
+        .enfoque-item .icon {
+            font-size: 2rem;
+            color: var(--primary);
+        }
+
+        /* Team */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+            justify-items: center;
+        }
+
+        .team-card {
+            background: var(--secondary);
+            padding: 2rem;
+            border-radius: 20px;
+            text-align: center;
+            width: 100%;
+            max-width: 350px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .team-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+
+        .team-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 217, 255, 0.3);
+        }
+
+        .team-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin: 0 auto 1.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            border: 5px solid var(--dark);
+        }
+
+        .team-card h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-size: 1.5rem;
+        }
+
+        .team-card .role {
+            color: var(--accent);
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        /* Download Section */
+        .download-section {
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--dark) 100%);
+            padding: 4rem;
+            border-radius: 20px;
+            text-align: center;
+            border: 2px solid var(--primary);
+        }
+
+        .download-options {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .download-card {
+            background: var(--dark);
+            padding: 2rem;
+            border-radius: 15px;
+            min-width: 200px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .download-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(0, 217, 255, 0.3);
+        }
+
+        .download-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Chatbot */
+        .chatbot-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: var(--dark);
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(0, 217, 255, 0.5);
+            z-index: 999;
+            transition: all 0.3s;
+        }
+
+        .chatbot-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .chatbot-container {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 350px;
+            height: 500px;
+            background: var(--secondary);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            display: none;
+            flex-direction: column;
+            z-index: 998;
+            border: 2px solid var(--primary);
+        }
+
+        .chatbot-container.active {
+            display: flex;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .chatbot-header {
+            background: var(--primary);
+            color: var(--dark);
+            padding: 1rem;
+            border-radius: 18px 18px 0 0;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chatbot-close {
+            background: none;
+            border: none;
+            color: var(--dark);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .chatbot-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .message {
+            padding: 0.8rem;
+            border-radius: 10px;
+            max-width: 80%;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .message.bot {
+            background: var(--dark);
+            align-self: flex-start;
+            border: 1px solid var(--primary);
+        }
+
+        .message.user {
+            background: var(--primary);
+            color: var(--dark);
+            align-self: flex-end;
+        }
+
+        .chatbot-options {
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            border-top: 1px solid var(--dark);
+        }
+
+        .chat-option {
+            background: var(--dark);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            padding: 0.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .chat-option:hover {
+            background: var(--primary);
+            color: var(--dark);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--secondary);
+            padding: 2rem 5%;
+            text-align: center;
+            border-top: 2px solid var(--primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: flex;
+            }
+
+            .nav-links {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--secondary);
+                flex-direction: column;
+                padding: 2rem;
+                transform: translateY(-100%);
+                opacity: 0;
+                pointer-events: none;
+                transition: all 0.3s;
+            }
+
+            .nav-links.active {
+                transform: translateY(0);
+                opacity: 1;
+                pointer-events: all;
+            }
+
+            .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-text h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-image {
+                order: -1;
+            }
+
+            .cta-buttons {
+                justify-content: center;
+                flex-direction: column;
+            }
+
+            .chatbot-container {
+                width: 90%;
+                right: 5%;
+            }
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0) translateX(-50%); }
+            40% { transform: translateY(-20px) translateX(-50%); }
+            60% { transform: translateY(-10px) translateX(-50%); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav>
+        <div class="logo">
+            📝 MemoCampus
+        </div>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="#inicio">Inicio</a></li>
+            <li><a href="#objetivo">Objetivo</a></li>
+            <li><a href="#objetivos-especificos">Objetivos</a></li>
+            <li><a href="#enfoque">Enfoque</a></li>
+            <li><a href="#equipo">Equipo</a></li>
+            <li><a href="#descargar">Descargar</a></li>
+        </ul>
+        <div class="menu-toggle" id="menuToggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="inicio">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>MemoCampus</h1>
+                <p>La solución definitiva para gestionar tus entregas académicas. Nunca más olvides una tarea importante.</p>
+                <div class="cta-buttons">
+                    <a href="#descargar" class="btn btn-primary">Descargar Gratis</a>
+                    <a href="#objetivo" class="btn btn-secondary">Conocer Más</a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="mockup" style="background: linear-gradient(135deg, #16213e 0%, #0f3460 100%); padding: 20px; display: flex; align-items: center; justify-content: center; font-size: 8rem;">
+                    📌
+                </div>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <span style="color: var(--primary); font-size: 2rem;">⬇</span>
+        </div>
+    </section>
+
+    <!-- Objetivo General -->
+    <section id="objetivo">
+        <h2 class="section-title">🎯 Objetivo General</h2>
+        <div class="enfoque-content">
+            <p style="font-size: 1.2rem; line-height: 1.8; text-align: center; color: var(--text-gray);">
+                Desarrollar una aplicación de escritorio intuitiva y eficiente que permita a los estudiantes universitarios 
+                organizar, gestionar y recibir alertas sobre sus entregas académicas, reduciendo el estrés y mejorando 
+                su rendimiento académico mediante una interfaz visual basada en post-its digitales y un sistema de 
+                notificaciones inteligente.
+            </p>
+        </div>
+    </section>
+
+    <!-- Objetivos Específicos -->
+    <section id="objetivos-especificos">
+        <h2 class="section-title">🎓 Objetivos Específicos</h2>
+        <div class="objetivos-grid">
+            <div class="objetivo-card">
+                <div class="objetivo-icon">📋</div>
+                <h3>Centralizar Información</h3>
+                <p>Crear un sistema centralizado que permita registrar todas las entregas académicas con detalles completos: título, fecha, hora, importancia y descripción.</p>
+            </div>
+            <div class="objetivo-card">
+                <div class="objetivo-icon">👁️</div>
+                <h3>Visualización Intuitiva</h3>
+                <p>Implementar una interfaz visual tipo post-its que facilite la organización y visualización rápida de las tareas pendientes y completadas.</p>
+            </div>
+            <div class="objetivo-card">
+                <div class="objetivo-icon">🔔</div>
+                <h3>Sistema de Alertas</h3>
+                <p>Desarrollar un sistema de notificaciones automáticas que alerte a los usuarios 1 hora antes de cada entrega para evitar olvidos.</p>
+            </div>
+            <div class="objetivo-card">
+                <div class="objetivo-icon">💾</div>
+                <h3>Persistencia de Datos</h3>
+                <p>Garantizar la seguridad y persistencia de la información mediante un sistema de guardado automático en formato JSON.</p>
+            </div>
+            <div class="objetivo-card">
+                <div class="objetivo-icon">🎨</div>
+                <h3>Experiencia de Usuario</h3>
+                <p>Proporcionar una experiencia de usuario moderna y atractiva con un diseño dark mode profesional y animaciones fluidas.</p>
+            </div>
+            <div class="objetivo-card">
+                <div class="objetivo-icon">⚡</div>
+                <h3>Funcionamiento Offline</h3>
+                <p>Asegurar que la aplicación funcione completamente sin conexión a internet, evitando distracciones y garantizando privacidad.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Enfoque -->
+    <section id="enfoque">
+        <h2 class="section-title">🔬 Nuestro Enfoque</h2>
+        <div class="enfoque-content">
+            <h3 style="color: var(--primary); font-size: 1.8rem; margin-bottom: 2rem;">Metodología de Desarrollo</h3>
+            <div class="enfoque-items">
+                <div class="enfoque-item">
+                    <div class="icon">🚀</div>
+                    <div>
+                        <h4 style="color: var(--primary); margin-bottom: 0.5rem;">MVP - Producto Mínimo Viable</h4>
+                        <p style="color: var(--text-gray);">Desarrollo ágil enfocado en funcionalidades esenciales para validación rápida del mercado.</p>
+                    </div>
+                </div>
+                <div class="enfoque-item">
+                    <div class="icon">🎨</div>
+                    <div>
+                        <h4 style="color: var(--primary); margin-bottom: 0.5rem;">Design Thinking</h4>
+                        <p style="color: var(--text-gray);">Diseño centrado en el usuario basado en empatía con los problemas reales de los estudiantes.</p>
+                    </div>
+                </div>
+                <div class="enfoque-item">
+                    <div class="icon">📊</div>
+                    <div>
+                        <h4 style="color: var(--primary); margin-bottom: 0.5rem;">Lean Startup</h4>
+                        <p style="color: var(--text-gray);">Ciclo continuo de construcción, medición y aprendizaje para mejora constante.</p>
+                    </div>
+                </div>
+                <div class="enfoque-item">
+                    <div class="icon">💰</div>
+                    <div>
+                        <h4 style="color: var(--primary); margin-bottom: 0.5rem;">Modelo Freemium</h4>
+                        <p style="color: var(--text-gray);">Versión gratuita completa con opciones premium futuras para sostenibilidad.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Equipo -->
+    <section id="equipo">
+        <h2 class="section-title">👥 Nuestro Equipo</h2>
+        <div class="team-grid">
+            <div class="team-card">
+                <div class="team-avatar">👨‍💻</div>
+                <h3>Tomas Alejandro Pérez Tovar</h3>
+                <p class="role">Líder de Equipo de Programación</p>
+                <p style="color: var(--text-gray); line-height: 1.6;">
+                    Encargado del desarrollo técnico, arquitectura de software y gestión del equipo de desarrollo. 
+                    Especialista en Python y diseño de interfaces de usuario.
+                </p>
+            </div>
+            <div class="team-card">
+                <div class="team-avatar">💼</div>
+                <h3>Bryan Armando Pastrana Gutiérrez</h3>
+                <p class="role">CEO & Líder de Recursos</p>
+                <p style="color: var(--text-gray); line-height: 1.6;">
+                    Responsable de la estrategia de negocio, gestión de recursos y visión del producto. 
+                    Experto en emprendimiento y desarrollo de mercado.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Descargar -->
+    <section id="descargar">
+        <h2 class="section-title">⬇️ Descarga MemoCampus</h2>
+        <div class="download-section">
+            <h3 style="font-size: 2rem; margin-bottom: 1rem;">Disponible para tu plataforma</h3>
+            <p style="font-size: 1.2rem; color: var(--text-gray); margin-bottom: 2rem;">
+                Versión gratuita con todas las funcionalidades esenciales
+            </p>
+            <div class="download-options">
+                <div class="download-card" onclick="descargar('windows')">
+                    <div class="download-icon">🪟</div>
+                    <h4 style="color: var(--primary); margin-bottom: 0.5rem;">Windows</h4>
+                    <p style="color: var(--text-gray);">Windows 10/11</p>
+                    <p style="font-size: 0.9rem; color: var(--text-gray); margin-top: 0.5rem;">v1.0</p>
+                </div>
+                <div class="download-card" onclick="descargar('mac')">
+                    <div class="download-icon">🍎</div>
+                    <h4 style="color: var(--primary); margin-bottom: 0.5rem;">macOS</h4>
+                    <p style="color: var(--text-gray);">macOS 10.15+</p>
+                    <p style="font-size: 0.9rem; color: var(--text-gray); margin-top: 0.5rem;">v1.0</p>
+                </div>
+                <div class="download-card" onclick="descargar('linux')">
+                    <div class="download-icon">🐧</div>
+                    <h4 style="color: var(--primary); margin-bottom: 0.5rem;">Linux</h4>
+                    <p style="color: var(--text-gray);">Ubuntu/Debian</p>
+                    <p style="font-size: 0.9rem; color: var(--text-gray); margin-top: 0.5rem;">v1.0</p>
+                </div>
+            </div>
+            <div style="margin-top: 2rem;">
+                <p style="color: var(--text-gray); margin-bottom: 1rem;">O descarga el código fuente:</p>
+                <a href="https://github.com/cosmic621/MemoCampus" target="_blank" class="btn btn-secondary" style="display: inline-block;">
+                    💻 Ver en GitHub
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 MemoCampus. Todos los derechos reservados.</p>
+        <p style="margin-top: 1rem; color: var(--text-gray);">Desarrollado con ❤️ para estudiantes</p>
+    </footer>
+
+    <!-- Chatbot Button -->
+    <button class="chatbot-btn" id="chatbotBtn">💬</button>
+
+    <!-- Chatbot Container -->
+    <div class="chatbot-container" id="chatbotContainer">
+        <div class="chatbot-header">
+            <span>🤖 Asistente MemoCampus</span>
+            <button class="chatbot-close" id="chatbotClose">✕</button>
+        </div>
+        <div class="chatbot-messages" id="chatbotMessages">
+            <div class="message bot">
+                ¡Hola! 👋 Soy el asistente virtual de MemoCampus. ¿En qué puedo ayudarte hoy?
+            </div>
+        </div>
+        <div class="chatbot-options" id="chatbotOptions">
+            <button class="chat-option" onclick="responderPregunta('quienes')">¿Quiénes somos?</button>
+            <button class="chat-option" onclick="responderPregunta('objetivo')">¿Cuál es su objetivo?</button>
+            <button class="chat-option" onclick="responderPregunta('funciona')">¿Cómo funciona?</button>
+            <button class="chat-option" onclick="responderPregunta('gratis')">¿Es gratis?</button>
+            <button class="chat-option" onclick="responderPregunta('descargar')">¿Cómo descargar?</button>
+            <button class="chat-option" onclick="responderPregunta('contacto')">Contacto</button>
+        </div>
+    </div>
+
+    <script>
+        // Menu Toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const navLinks = document.getElementById('navLinks');
+
+        menuToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+
+        // Smooth Scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    navLinks.classList.remove('active');
+                }
+            });
+        });
+
+        // Chatbot
+        const chatbotBtn = document.getElementById('chatbotBtn');
+        const chatbotContainer = document.getElementById('chatbotContainer');
+        const chatbotClose = document.getElementById('chatbotClose');
+        const chatbotMessages = document.getElementById('chatbotMessages');
+
+        chatbotBtn.addEventListener('click', () => {
+            chatbotContainer.classList.toggle('active');
+        });
+
+        chatbotClose.addEventListener('click', () => {
+            chatbotContainer.classList.remove('active');
+        });
+
+        function agregarMensaje(texto, esBot = true) {
+            const mensaje = document.createElement('div');
+            mensaje.className = `message ${esBot ? 'bot' : 'user'}`;
+            mensaje.textContent = texto;
+            chatbotMessages.appendChild(mensaje);
+            chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+        }
+
+        function responderPregunta(tipo) {
+            let pregunta = '';
+            let respuesta = '';
+
+            switch(tipo) {
+                case 'quienes':
+                    pregunta = '¿Quiénes somos?';
+                    respuesta = 'Somos un equipo de desarrollo comprometido con mejorar la vida académica de los estudiantes. MemoCampus fue creado por Tomas Alejandro Pérez Tovar y Bryan Armando Pastrana Gutiérrez, estudiantes que entendieron el problema de la desorganización académica y decidieron crear una solución.';
+                    break;
+                case 'objetivo':
+                    pregunta = '¿Cuál es su objetivo?';
+                    respuesta = 'Nuestro objetivo es ayudar a los estudiantes a nunca olvidar una entrega académica. Queremos reducir el estrés y mejorar el rendimiento académico mediante una herramienta simple, visual e intuitiva.';
+                    break;
+                case 'funciona':
+                    pregunta = '¿Cómo funciona?';
+                    respuesta = 'MemoCampus es muy simple: 1) Agregas tus entregas con fecha y hora, 2) Las visualizas en post-its digitales o en lista, 3) Recibes alertas 1 hora antes, 4) Marcas como completadas. ¡Así de fácil! Todo funciona offline.';
+                    break;
+                case 'gratis':
+                    pregunta = '¿Es gratis?';
+                    respuesta = '¡Sí! La versión actual es completamente gratuita con todas las funcionalidades esenciales. En el futuro habrá una versión premium con características adicionales como sincronización en la nube y app móvil.';
+                    break;
+                case 'descargar':
+                    pregunta = '¿Cómo descargar?';
+                    respuesta = 'Puedes descargar MemoCampus desde la sección "Descargar" en esta página. Está disponible para Windows, macOS y Linux. También puedes descargar el código fuente desde nuestro repositorio de GitHub.';
+                    break;
+                case 'contacto':
+                    pregunta = 'Contacto';
+                    respuesta = 'Puedes contactarnos a través de nuestro GitHub o enviarnos tus comentarios. Estamos siempre abiertos a sugerencias y mejoras. ¡Tu feedback es muy valioso para nosotros!';
+                    break;
+            }
+
+            agregarMensaje(pregunta, false);
+            setTimeout(() => agregarMensaje(respuesta, true), 500);
+        }
+
+        function descargar(plataforma) {
+            let mensaje = '';
+            switch(plataforma) {
+                case 'windows':
+                    mensaje = '📥 Descargando MemoCampus para Windows...\n\nRequisitos:\n- Python 3.7+\n- pip install tkcalendar\n\nInstrucciones:\n1. Descarga el archivo memocampus.py\n2. Instala las dependencias: py -m pip install tkcalendar\n3. Ejecuta: py memocampus.py';
+                    break;
+                case 'mac':
+                    mensaje = '📥 Descargando MemoCampus para macOS...\n\nRequisitos:\n- Python 3.7+\n- pip3 install tkcalendar\n\nInstrucciones:\n1. Descarga el archivo memocampus.py\n2. Instala las dependencias: pip3 install tkcalendar\n3. Ejecuta: python3 memocampus.py';
+                    break;
+                case 'linux':
+                    mensaje = '📥 Descargando MemoCampus para Linux...\n\nRequisitos:\n- Python 3.7+\n- sudo apt-get install python3-tk\n- pip3 install tkcalendar\n\nInstrucciones:\n1. Descarga el archivo memocampus.py\n2. Instala dependencias\n3. Ejecuta: python3 memocampus.py';
+                    break;
+            }
+            alert(mensaje);
+            
+            // Crear y descargar el archivo Python
+            descargarArchivoPython();
+        }
+
+        function descargarArchivoPython() {
+            const codigoPython = `import tkinter as tk
+from tkinter import ttk, messagebox
+from tkcalendar import DateEntry
+import datetime
+import json
+import os
+
+class MemoCampus:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("MemoCampus - Gestor de Entregas")
+        self.root.geometry("1200x700")
+        self.root.configure(bg="#1a1a2e")
+
+        self.entregas = []
+        self.postits = []
+        self.drag_data = {"x": 0, "y": 0, "items": None}
+        self.archivo_datos = "memocampus_datos.json"
+
+        self.cargar_datos()
+        self.crear_interfaz()
+        self.actualizar_vista()
+        self.verificar_alertas()
+        self.centrar_ventana()
+
+    def centrar_ventana(self):
+        self.root.update_idletasks()
+        ancho_ventana = self.root.winfo_width()
+        alto_ventana = self.root.winfo_height()
+        ancho_pantalla = self.root.winfo_screenwidth()
+        alto_pantalla = self.root.winfo_screenheight()
+        x = (ancho_pantalla // 2) - (ancho_ventana // 2)
+        y = (alto_pantalla // 2) - (alto_ventana // 2)
+        self.root.geometry(f"{ancho_ventana}x{alto_ventana}+{x}+{y}")
+
+    def crear_interfaz(self):
+        panel_izq = tk.Frame(self.root, bg="#16213e", width=350)
+        panel_izq.pack(side="left", fill="both", padx=0, pady=0)
+        panel_izq.pack_propagate(False)
+
+        titulo_panel = tk.Label(panel_izq, text="📝 Nueva Entrega", 
+                               font=("Segoe UI", 18, "bold"), 
+                               bg="#16213e", fg="#00d9ff")
+        titulo_panel.pack(pady=20)
+
+        form_frame = tk.Frame(panel_izq, bg="#16213e")
+        form_frame.pack(pady=10, padx=20, fill="both", expand=True)
+
+        tk.Label(form_frame, text="Título", font=("Segoe UI", 11, "bold"),
+                bg="#16213e", fg="#ffffff").pack(anchor="w", pady=(10, 5))
+        self.titulo_entry = tk.Entry(form_frame, font=("Segoe UI", 11),
+                                     bg="#0f3460", fg="white", 
+                                     insertbackground="white",
+                                     relief="flat", bd=0)
+        self.titulo_entry.pack(fill="x", ipady=8)
+
+        tk.Label(form_frame, text="Fecha de Entrega", font=("Segoe UI", 11, "bold"),
+                bg="#16213e", fg="#ffffff").pack(anchor="w", pady=(15, 5))
+        self.fecha_entry = DateEntry(form_frame, width=30, 
+                                     background="#00d9ff", 
+                                     foreground="white", 
+                                     borderwidth=0,
+                                     font=("Segoe UI", 10),
+                                     date_pattern='dd/mm/yyyy')
+        self.fecha_entry.pack(fill="x", ipady=5)
+
+        tk.Label(form_frame, text="Hora (HH:MM)", font=("Segoe UI", 11, "bold"),
+                bg="#16213e", fg="#ffffff").pack(anchor="w", pady=(15, 5))
+        self.hora_entry = tk.Entry(form_frame, font=("Segoe UI", 11),
+                                   bg="#0f3460", fg="white",
+                                   insertbackground="white",
+                                   relief="flat", bd=0)
+        self.hora_entry.pack(fill="x", ipady=8)
+        self.hora_entry.insert(0, "23:59")
+
+        tk.Label(form_frame, text="Nivel de Importancia", font=("Segoe UI", 11, "bold"),
+                bg="#16213e", fg="#ffffff").pack(anchor="w", pady=(15, 5))
+        
+        self.importancia_var = tk.StringVar()
+        style = ttk.Style()
+        style.theme_use('clam')
+        style.configure('TCombobox', fieldbackground="#0f3460", 
+                       background="#00d9ff", foreground="white")
+        
+        self.importancia_combo = ttk.Combobox(form_frame, 
+                                             textvariable=self.importancia_var,
+                                             state="readonly",
+                                             font=("Segoe UI", 10))
+        self.importancia_combo['values'] = ("🔴 Alta", "🟠 Media", "🟢 Baja")
+        self.importancia_combo.pack(fill="x", ipady=5)
+        self.importancia_combo.current(1)
+
+        tk.Label(form_frame, text="Descripción de la Tarea", font=("Segoe UI", 11, "bold"),
+                bg="#16213e", fg="#ffffff").pack(anchor="w", pady=(15, 5))
+        
+        desc_frame = tk.Frame(form_frame, bg="#0f3460", bd=0)
+        desc_frame.pack(fill="both", expand=True)
+        
+        self.descripcion_text = tk.Text(desc_frame, font=("Segoe UI", 10),
+                                       bg="#0f3460", fg="white",
+                                       insertbackground="white",
+                                       relief="flat", bd=0,
+                                       height=4, wrap="word")
+        self.descripcion_text.pack(side="left", fill="both", expand=True)
+        
+        desc_scrollbar = tk.Scrollbar(desc_frame, command=self.descripcion_text.yview)
+        desc_scrollbar.pack(side="right", fill="y")
+        self.descripcion_text.config(yscrollcommand=desc_scrollbar.set)
+
+        btn_frame = tk.Frame(form_frame, bg="#16213e")
+        btn_frame.pack(pady=30)
+
+        btn_agregar = tk.Button(btn_frame, text="➕ Agregar", 
+                               command=self.agregar_entrega,
+                               font=("Segoe UI", 12, "bold"),
+                               bg="#00d9ff", fg="white",
+                               activebackground="#00b8d4",
+                               relief="flat", bd=0,
+                               cursor="hand2",
+                               padx=30, pady=10)
+        btn_agregar.pack(pady=5, fill="x")
+
+        btn_guardar = tk.Button(btn_frame, text="💾 Guardar Todo", 
+                               command=self.guardar_datos,
+                               font=("Segoe UI", 11, "bold"),
+                               bg="#e94560", fg="white",
+                               activebackground="#c73a50",
+                               relief="flat", bd=0,
+                               cursor="hand2",
+                               padx=30, pady=8)
+        btn_guardar.pack(pady=5, fill="x")
+
+        btn_eliminar = tk.Button(btn_frame, text="🗑️ Eliminar Seleccionados", 
+                                command=self.eliminar_seleccionados,
+                                font=("Segoe UI", 11, "bold"),
+                                bg="#533483", fg="white",
+                                activebackground="#432870",
+                                relief="flat", bd=0,
+                                cursor="hand2",
+                                padx=30, pady=8)
+        btn_eliminar.pack(pady=5, fill="x")
+
+        btn_eliminar_completadas = tk.Button(btn_frame, text="✓ Eliminar Completadas", 
+                                            command=self.eliminar_completadas,
+                                            font=("Segoe UI", 11, "bold"),
+                                            bg="#7f8c8d", fg="white",
+                                            activebackground="#6c7a7b",
+                                            relief="flat", bd=0,
+                                            cursor="hand2",
+                                            padx=30, pady=8)
+        btn_eliminar_completadas.pack(pady=5, fill="x")
+
+        panel_der = tk.Frame(self.root, bg="#1a1a2e")
+        panel_der.pack(side="right", fill="both", expand=True)
+
+        self.notebook = ttk.Notebook(panel_der)
+        self.notebook.pack(fill="both", expand=True, padx=10, pady=10)
+
+        style.configure('TNotebook', background="#1a1a2e", borderwidth=0)
+        style.configure('TNotebook.Tab', background="#16213e", 
+                       foreground="white", padding=[20, 10],
+                       font=("Segoe UI", 10, "bold"))
+        style.map('TNotebook.Tab', background=[('selected', '#00d9ff')],
+                 foreground=[('selected', 'white')])
+
+        self.tab_postits = tk.Frame(self.notebook, bg="#0f3460")
+        self.notebook.add(self.tab_postits, text="📌 Post-its")
+
+        canvas_frame = tk.Frame(self.tab_postits, bg="#0f3460")
+        canvas_frame.pack(fill="both", expand=True, padx=10, pady=10)
+
+        scrollbar_y = tk.Scrollbar(canvas_frame, orient="vertical")
+        scrollbar_y.pack(side="right", fill="y")
+
+        scrollbar_x = tk.Scrollbar(canvas_frame, orient="horizontal")
+        scrollbar_x.pack(side="bottom", fill="x")
+
+        self.canvas = tk.Canvas(canvas_frame, bg="#0f3460", 
+                               highlightthickness=0,
+                               yscrollcommand=scrollbar_y.set,
+                               xscrollcommand=scrollbar_x.set)
+        self.canvas.pack(side="left", fill="both", expand=True)
+
+        scrollbar_y.config(command=self.canvas.yview)
+        scrollbar_x.config(command=self.canvas.xview)
+
+        self.canvas.bind("<Configure>", lambda e: self.canvas.configure(
+            scrollregion=self.canvas.bbox("all")))
+
+        self.canvas.tag_bind("postit", "<ButtonPress-1>", self.iniciar_drag)
+        self.canvas.tag_bind("postit", "<ButtonRelease-1>", self.finalizar_drag)
+        self.canvas.tag_bind("postit", "<B1-Motion>", self.mover_postit)
+        self.canvas.tag_bind("postit", "<Double-Button-1>", self.mostrar_detalle_postit)
+
+        self.tab_lista = tk.Frame(self.notebook, bg="#0f3460")
+        self.notebook.add(self.tab_lista, text="📋 Lista de Entregas")
+
+        tree_frame = tk.Frame(self.tab_lista, bg="#0f3460")
+        tree_frame.pack(fill="both", expand=True, padx=10, pady=10)
+
+        style.configure("Treeview", background="#16213e", 
+                       foreground="white", fieldbackground="#16213e",
+                       font=("Segoe UI", 10))
+        style.configure("Treeview.Heading", background="#00d9ff", 
+                       foreground="white", font=("Segoe UI", 11, "bold"))
+        style.map('Treeview', background=[('selected', '#00d9ff')])
+
+        scrollbar_tree = ttk.Scrollbar(tree_frame, orient="vertical")
+        scrollbar_tree.pack(side="right", fill="y")
+
+        self.tree = ttk.Treeview(tree_frame, 
+                                columns=("Sel", "Título", "Fecha", "Hora", "Importancia", "Estado"),
+                                show="headings", 
+                                height=20,
+                                yscrollcommand=scrollbar_tree.set)
+        
+        scrollbar_tree.config(command=self.tree.yview)
+
+        self.tree.heading("Sel", text="☑")
+        self.tree.heading("Título", text="Título")
+        self.tree.heading("Fecha", text="Fecha")
+        self.tree.heading("Hora", text="Hora")
+        self.tree.heading("Importancia", text="Importancia")
+        self.tree.heading("Estado", text="Estado")
+
+        self.tree.column("Sel", width=50, anchor="center")
+        self.tree.column("Título", width=250)
+        self.tree.column("Fecha", width=100, anchor="center")
+        self.tree.column("Hora", width=80, anchor="center")
+        self.tree.column("Importancia", width=100, anchor="center")
+        self.tree.column("Estado", width=100, anchor="center")
+
+        self.tree.pack(fill="both", expand=True)
+        self.tree.bind("<Button-1>", self.toggle_seleccion)
+        self.tree.bind("<Double-Button-1>", self.mostrar_detalle_tree)
+
+    def agregar_entrega(self):
+        titulo = self.titulo_entry.get().strip()
+        fecha = self.fecha_entry.get_date()
+        hora = self.hora_entry.get().strip()
+        importancia = self.importancia_var.get()
+        descripcion = self.descripcion_text.get("1.0", "end-1c").strip()
+
+        if not titulo or not hora:
+            messagebox.showwarning("Campos incompletos", 
+                                  "Por favor ingresa un título y una hora.")
+            return
+
+        try:
+            hora_valida = datetime.datetime.strptime(hora, "%H:%M").time()
+        except ValueError:
+            messagebox.showerror("Formato inválido", 
+                               "La hora debe estar en formato HH:MM (ejemplo: 14:30)")
+            return
+
+        entrega = {
+            "titulo": titulo,
+            "fecha": fecha,
+            "hora": hora_valida,
+            "importancia": importancia,
+            "descripcion": descripcion,
+            "completada": False,
+            "seleccionada": False
+        }
+        self.entregas.append(entrega)
+
+        self.titulo_entry.delete(0, tk.END)
+        self.hora_entry.delete(0, tk.END)
+        self.hora_entry.insert(0, "23:59")
+        self.descripcion_text.delete("1.0", tk.END)
+
+        self.actualizar_vista()
+        self.mostrar_notificacion(f"✅ Entrega agregada:\\n{titulo}", "#00d9ff")
+
+    def actualizar_vista(self):
+        self.canvas.delete("all")
+        self.postits.clear()
+        
+        for item in self.tree.get_children():
+            self.tree.delete(item)
+
+        for idx, entrega in enumerate(self.entregas):
+            self.crear_postit(entrega, idx)
+            
+            estado = "✓ Completa" if entrega["completada"] else "⏳ Pendiente"
+            sel = "☑" if entrega.get("seleccionada", False) else "☐"
+            
+            self.tree.insert("", "end", values=(
+                sel,
+                entrega["titulo"],
+                entrega["fecha"].strftime("%d/%m/%Y"),
+                entrega["hora"].strftime("%H:%M"),
+                entrega["importancia"],
+                estado
+            ))
+
+        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+
+    def crear_postit(self, entrega, idx):
+        colores = {
+            "🔴 Alta": "#ff6b6b",
+            "🟠 Media": "#ffa500",
+            "🟢 Baja": "#51cf66"
+        }
+        color = colores.get(entrega["importancia"], "#ffa500")
+
+        x = 30 + (idx % 4) * 180
+        y = 30 + (idx // 4) * 180
+
+        shadow = self.canvas.create_rectangle(x+5, y+5, x+165, y+165,
+                                             fill="#000000", outline="",
+                                             tags=("postit", f"postit_{idx}"))
+
+        rect = self.canvas.create_rectangle(x, y, x+160, y+160,
+                                           fill="#fff9c4", outline="#f9a825",
+                                           width=3, tags=("postit", f"postit_{idx}"))
+
+        titulo_corto = entrega["titulo"][:20] + "..." if len(entrega["titulo"]) > 20 else entrega["titulo"]
+        text = self.canvas.create_text(x+80, y+30, text=titulo_corto,
+                                      tags=("postit", f"postit_{idx}"),
+                                      font=("Segoe UI", 11, "bold"),
+                                      width=140)
+
+        fecha_texto = f"📅 {entrega['fecha'].strftime('%d/%m/%Y')}"
+        fecha_label = self.canvas.create_text(x+80, y+70, text=fecha_texto,
+                                             tags=("postit", f"postit_{idx}"),
+                                             font=("Segoe UI", 9))
+
+        hora_texto = f"🕐 {entrega['hora'].strftime('%H:%M')}"
+        hora_label = self.canvas.create_text(x+80, y+95, text=hora_texto,
+                                            tags=("postit", f"postit_{idx}"),
+                                            font=("Segoe UI", 9))
+
+        circ = self.canvas.create_oval(x+10, y+10, x+30, y+30,
+                                       fill=color, outline="white", width=2,
+                                       tags=("postit", f"postit_{idx}"))
+
+        if entrega["completada"]:
+            check = self.canvas.create_text(x+80, y+130, text="✓ COMPLETA",
+                                          tags=("postit", f"postit_{idx}"),
+                                          font=("Segoe UI", 10, "bold"),
+                                          fill="#2ecc71")
+
+        self.postits.append({
+            "items": [shadow, rect, text, fecha_label, hora_label, circ],
+            "entrega": entrega,
+            "index": idx
+        })
+
+    def iniciar_drag(self, event):
+        item = self.canvas.find_closest(event.x, event.y)[0]
+        for postit in self.postits:
+            if item in postit["items"]:
+                self.drag_data["items"] = postit["items"]
+                break
+        
+        self.drag_data["x"] = event.x
+        self.drag_data["y"] = event.y
+
+    def mover_postit(self, event):
+        if self.drag_data["items"]:
+            dx = event.x - self.drag_data["x"]
+            dy = event.y - self.drag_data["y"]
+            
+            for item in self.drag_data["items"]:
+                self.canvas.move(item, dx, dy)
+            
+            self.drag_data["x"] = event.x
+            self.drag_data["y"] = event.y
+
+    def finalizar_drag(self, event):
+        self.drag_data["items"] = None
+
+    def mostrar_detalle_postit(self, event):
+        item = self.canvas.find_closest(event.x, event.y)[0]
+        for postit in self.postits:
+            if item in postit["items"]:
+                self.mostrar_popup_detalle(postit["entrega"], postit["index"])
+                break
+
+    def mostrar_detalle_tree(self, event):
+        region = self.tree.identify("region", event.x, event.y)
+        if region == "cell":
+            item = self.tree.identify_row(event.y)
+            if item:
+                idx = self.tree.index(item)
+                if idx < len(self.entregas):
+                    self.mostrar_popup_detalle(self.entregas[idx], idx)
+
+    def mostrar_popup_detalle(self, entrega, idx):
+        popup = tk.Toplevel(self.root)
+        popup.title("Detalles de la Entrega")
+        popup.geometry("500x550")
+        popup.configure(bg="#16213e")
+        popup.resizable(False, False)
+        
+        popup.transient(self.root)
+        popup.grab_set()
+
+        tk.Label(popup, text="📋 Detalles de la Entrega",
+                font=("Segoe UI", 16, "bold"),
+                bg="#16213e", fg="#00d9ff").pack(pady=20)
+
+        detalle_frame = tk.Frame(popup, bg="#0f3460", relief="raised", bd=2)
+        detalle_frame.pack(padx=30, pady=10, fill="both", expand=True)
+
+        info = [
+            ("📌 Título:", entrega["titulo"]),
+            ("📅 Fecha:", entrega["fecha"].strftime("%d/%m/%Y")),
+            ("🕐 Hora:", entrega["hora"].strftime("%H:%M")),
+            ("⚠️ Importancia:", entrega["importancia"]),
+            ("📊 Estado:", "✓ Completada" if entrega["completada"] else "⏳ Pendiente")
+        ]
+
+        for i, (label, valor) in enumerate(info):
+            frame = tk.Frame(detalle_frame, bg="#0f3460")
+            frame.pack(fill="x", padx=20, pady=8)
+
+            tk.Label(frame, text=label, font=("Segoe UI", 11, "bold"),
+                    bg="#0f3460", fg="#ffffff").pack(anchor="w")
+            tk.Label(frame, text=valor, font=("Segoe UI", 11),
+                    bg="#0f3460", fg="#cccccc").pack(anchor="w", padx=20)
+
+        if entrega.get("descripcion"):
+            desc_container = tk.Frame(detalle_frame, bg="#0f3460")
+            desc_container.pack(fill="both", expand=True, padx=20, pady=8)
+            
+            tk.Label(desc_container, text="📝 Descripción:", font=("Segoe UI", 11, "bold"),
+                    bg="#0f3460", fg="#ffffff").pack(anchor="w")
+            
+            desc_frame = tk.Frame(desc_container, bg="#16213e", relief="sunken", bd=1)
+            desc_frame.pack(fill="both", expand=True, padx=20, pady=5)
+            
+            desc_text = tk.Text(desc_frame, font=("Segoe UI", 10),
+                               bg="#16213e", fg="#cccccc",
+                               wrap="word", height=6, relief="flat")
+            desc_text.pack(side="left", fill="both", expand=True, padx=5, pady=5)
+            desc_text.insert("1.0", entrega["descripcion"])
+            desc_text.config(state="disabled")
+            
+            desc_scroll = tk.Scrollbar(desc_frame, command=desc_text.yview)
+            desc_scroll.pack(side="right", fill="y")
+            desc_text.config(yscrollcommand=desc_scroll.set)
+
+        btn_frame = tk.Frame(popup, bg="#16213e")
+        btn_frame.pack(pady=20)
+
+        if not entrega["completada"]:
+            btn_completar = tk.Button(btn_frame, text="✓ Marcar como Completa",
+                                     command=lambda: self.marcar_completa(idx, popup),
+                                     font=("Segoe UI", 10, "bold"),
+                                     bg="#2ecc71", fg="white",
+                                     relief="flat", padx=20, pady=8,
+                                     cursor="hand2")
+            btn_completar.pack(side="left", padx=5)
+
+        btn_eliminar = tk.Button(btn_frame, text="🗑️ Eliminar",
+                                command=lambda: self.eliminar_una(idx, popup),
+                                font=("Segoe UI", 10, "bold"),
+                                bg="#e74c3c", fg="white",
+                                relief="flat", padx=20, pady=8,
+                                cursor="hand2")
+        btn_eliminar.pack(side="left", padx=5)
+
+        btn_cerrar = tk.Button(btn_frame, text="Cerrar",
+                              command=popup.destroy,
+                              font=("Segoe UI", 10),
+                              bg="#95a5a6", fg="white",
+                              relief="flat", padx=20, pady=8,
+                              cursor="hand2")
+        btn_cerrar.pack(side="left", padx=5)
+
+    def marcar_completa(self, idx, popup):
+        if idx < len(self.entregas):
+            self.entregas[idx]["completada"] = True
+            self.actualizar_vista()
+            popup.destroy()
+            self.mostrar_notificacion("✓ Entrega marcada como completa", "#2ecc71")
+
+    def eliminar_una(self, idx, popup):
+        if idx < len(self.entregas):
+            titulo = self.entregas[idx]["titulo"]
+            self.entregas.pop(idx)
+            self.actualizar_vista()
+            popup.destroy()
+            self.mostrar_notificacion(f"🗑️ Eliminada:\\n{titulo}", "#e74c3c")
+
+    def toggle_seleccion(self, event):
+        region = self.tree.identify("region", event.x, event.y)
+        if region == "cell":
+            column = self.tree.identify_column(event.x)
+            if column == "#1":
+                item = self.tree.identify_row(event.y)
+                if item:
+                    idx = self.tree.index(item)
+                    if idx < len(self.entregas):
+                        self.entregas[idx]["seleccionada"] = not self.entregas[idx].get("seleccionada", False)
+                        self.actualizar_vista()
+
+    def eliminar_seleccionados(self):
+        seleccionados = [e for e in self.entregas if e.get("seleccionada", False)]
+        
+        if not seleccionados:
+            messagebox.showinfo("Sin selección", 
+                              "No hay entregas seleccionadas para eliminar.")
+            return
+
+        respuesta = messagebox.askyesno("Confirmar eliminación",
+                                       f"¿Eliminar {len(seleccionados)} entrega(s) seleccionada(s)?")
+        
+        if respuesta:
+            self.entregas = [e for e in self.entregas if not e.get("seleccionada", False)]
+            self.actualizar_vista()
+            self.mostrar_notificacion(f"🗑️ {len(seleccionados)} entrega(s) eliminada(s)", "#e74c3c")
+
+    def eliminar_completadas(self):
+        completadas = [e for e in self.entregas if e["completada"]]
+        
+        if not completadas:
+            messagebox.showinfo("Sin completadas", 
+                              "No hay entregas completadas para eliminar.")
+            return
+
+        respuesta = messagebox.askyesno("Confirmar eliminación",
+                                       f"¿Eliminar {len(completadas)} entrega(s) completada(s)?")
+        
+        if respuesta:
+            self.entregas = [e for e in self.entregas if not e["completada"]]
+            self.actualizar_vista()
+            self.mostrar_notificacion(f"✓ {len(completadas)} completada(s) eliminada(s)", "#2ecc71")
+
+    def guardar_datos(self):
+        try:
+            datos = []
+            for entrega in self.entregas:
+                datos.append({
+                    "titulo": entrega["titulo"],
+                    "fecha": entrega["fecha"].strftime("%Y-%m-%d"),
+                    "hora": entrega["hora"].strftime("%H:%M"),
+                    "importancia": entrega["importancia"],
+                    "descripcion": entrega.get("descripcion", ""),
+                    "completada": entrega["completada"]
+                })
+            
+            with open(self.archivo_datos, 'w', encoding='utf-8') as f:
+                json.dump(datos, f, indent=2, ensure_ascii=False)
+            
+            self.mostrar_notificacion("💾 Datos guardados correctamente", "#2ecc71")
+        except Exception as e:
+            messagebox.showerror("Error", f"No se pudo guardar: {str(e)}")
+
+    def cargar_datos(self):
+        if os.path.exists(self.archivo_datos):
+            try:
+                with open(self.archivo_datos, 'r', encoding='utf-8') as f:
+                    datos = json.load(f)
+                
+                for dato in datos:
+                    entrega = {
+                        "titulo": dato["titulo"],
+                        "fecha": datetime.datetime.strptime(dato["fecha"], "%Y-%m-%d").date(),
+                        "hora": datetime.datetime.strptime(dato["hora"], "%H:%M").time(),
+                        "importancia": dato["importancia"],
+                        "descripcion": dato.get("descripcion", ""),
+                        "completada": dato["completada"],
+                        "seleccionada": False
+                    }
+                    self.entregas.append(entrega)
+            except Exception as e:
+                print(f"Error al cargar datos: {e}")
+
+    def mostrar_notificacion(self, mensaje, color="#00d9ff"):
+        noti = tk.Toplevel(self.root)
+        noti.overrideredirect(True)
+        noti.attributes("-topmost", True)
+        noti.configure(bg="#000000")
+        
+        ancho, alto = 350, 120
+        x = self.root.winfo_screenwidth() - ancho - 30
+        y = self.root.winfo_screenheight() - alto - 80
+        noti.geometry(f"{ancho}x{alto}+{x}+{y}")
+
+        main_frame = tk.Frame(noti, bg=color, bd=0)
+        main_frame.place(x=3, y=3, width=ancho-6, height=alto-6)
+
+        inner_frame = tk.Frame(main_frame, bg="#1a1a2e", bd=0)
+        inner_frame.place(x=4, y=4, width=ancho-14, height=alto-14)
+
+        top_bar = tk.Frame(inner_frame, bg=color, height=6)
+        top_bar.pack(fill="x")
+
+        content_frame = tk.Frame(inner_frame, bg="#1a1a2e")
+        content_frame.pack(fill="both", expand=True, padx=15, pady=10)
+
+        iconos = {
+            "#00d9ff": "ℹ️",
+            "#2ecc71": "✅",
+            "#e74c3c": "🗑️",
+            "#ffa500": "⚠️"
+        }
+        icono = iconos.get(color, "📢")
+
+        msg_frame = tk.Frame(content_frame, bg="#1a1a2e")
+        msg_frame.pack(expand=True)
+
+        tk.Label(msg_frame, text=icono, 
+                font=("Segoe UI", 24),
+                bg="#1a1a2e").pack(side="left", padx=(0, 15))
+
+        tk.Label(msg_frame, text=mensaje, bg="#1a1a2e", fg="white",
+                wraplength=250, justify="left",
+                font=("Segoe UI", 11)).pack(side="left")
+
+        progress_canvas = tk.Canvas(inner_frame, bg="#1a1a2e", 
+                                    height=4, highlightthickness=0)
+        progress_canvas.pack(fill="x", side="bottom")
+
+        progress_bar = progress_canvas.create_rectangle(0, 0, ancho-14, 4, 
+                                                        fill=color, outline="")
+
+        x_final = x
+        x_inicial = self.root.winfo_screenwidth()
+        pasos = 20
+        
+        def animar_entrada(paso=0):
+            if paso < pasos:
+                x_actual = x_inicial - ((x_inicial - x_final) * paso / pasos)
+                noti.geometry(f"{ancho}x{alto}+{int(x_actual)}+{y}")
+                noti.after(10, lambda: animar_entrada(paso + 1))
+        
+        animar_entrada()
+
+        duracion = 3000
+        pasos_progress = 60
+        
+        def actualizar_progress(paso=0):
+            if paso < pasos_progress:
+                ancho_actual = (ancho - 14) * (1 - paso / pasos_progress)
+                progress_canvas.coords(progress_bar, 0, 0, ancho_actual, 4)
+                noti.after(duracion // pasos_progress, 
+                          lambda: actualizar_progress(paso + 1))
+            else:
+                animar_salida()
+        
+        def animar_salida(paso=0):
+            if paso < pasos:
+                x_actual = x_final + ((self.root.winfo_screenwidth() - x_final) * paso / pasos)
+                noti.geometry(f"{ancho}x{alto}+{int(x_actual)}+{y}")
+                noti.after(10, lambda: animar_salida(paso + 1))
+            else:
+                noti.destroy()
+        
+        noti.after(100, actualizar_progress)
+
+        def cerrar(e):
+            animar_salida()
+        
+        noti.bind("<Button-1>", cerrar)
+        for widget in [main_frame, inner_frame, content_frame, msg_frame]:
+            widget.bind("<Button-1>", cerrar)
+
+    def verificar_alertas(self):
+        ahora = datetime.datetime.now()
+        for entrega in self.entregas:
+            if not entrega["completada"]:
+                fecha_hora = datetime.datetime.combine(entrega["fecha"], entrega["hora"])
+                tiempo_restante = (fecha_hora - ahora).total_seconds()
+                
+                if 0 <= tiempo_restante <= 3600:
+                    minutos = int(tiempo_restante / 60)
+                    self.mostrar_notificacion(
+                        f"⚠️ ¡Entrega pronta!\\n{entrega['titulo']}\\nFaltan {minutos} minutos",
+                        "#e74c3c"
+                    )
+                    entrega["completada"] = True
+                    self.actualizar_vista()
+        
+        self.root.after(60000, self.verificar_alertas)
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = MemoCampus(root)
+    root.mainloop()
+`;
+
+            const blob = new Blob([codigoPython], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'memocampus.py';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        }
+
+        // Crear archivo requirements.txt
+        function descargarRequirements() {
+            const requirements = 'tkcalendar==1.6.1';
+            const blob = new Blob([requirements], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'requirements.txt';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        }
+
+        // Crear README
+        function descargarReadme() {
+            const readme = `# MemoCampus - Gestor de Entregas Académicas
+
+## Instalación
+
+### Requisitos
+- Python 3.7 o superior
+- pip (gestor de paquetes de Python)
+
+### Pasos de instalación
+
+#### Windows:
+\`\`\`bash
+# 1. Instalar dependencias
+py -m pip install tkcalendar
+
+# 2. Ejecutar la aplicación
+py memocampus.py
+\`\`\`
+
+#### macOS/Linux:
+\`\`\`bash
+# 1. Instalar dependencias
+pip3 install tkcalendar
+
+# 2. Ejecutar la aplicación
+python3 memocampus.py
+\`\`\`
+
+## Características
+
+- 📌 Vista de Post-its visual e interactiva
+- 📋 Lista organizada de entregas
+- ⏰ Sistema de alertas 1 hora antes
+- 💾 Guardado automático de datos
+- 🎨 Interfaz moderna con tema oscuro
+
+## Uso
+
+1. Completa el formulario con los datos de tu entrega
+2. Haz clic en "➕ Agregar"
+3. Visualiza tus entregas en Post-its o Lista
+4. Doble clic para ver detalles
+5. Marca como completadas cuando termines
+
+## Soporte
+
+Para reportar problemas o sugerencias, visita nuestro repositorio en GitHub.
+
+© 2025 MemoCampus - Desarrollado con ❤️ para estudiantes
+`;
+            const blob = new Blob([readme], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'README.md';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        }
+    </script>
+</body>
+</html>
